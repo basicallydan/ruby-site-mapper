@@ -18,16 +18,6 @@ describe Crawler, "#extract_links_from_html" do
 	end
 end
 
-describe Crawler, "#get_page_links" do
-	it "returns a list of anchor links" do
-		crawler = Crawler.new
-		links = crawler.get_page_links("https://gocardless.com")
-		links.should include("https://gocardless.com/blog")
-		# puts links
-		links.length.should be > 1
-	end
-end
-
 describe Crawler, "#extract_static_assets_from_html" do
 	it "returns images" do
 		crawler = Crawler.new
@@ -46,6 +36,15 @@ describe Crawler, "#extract_static_assets_from_html" do
 		static_assets = crawler.extract_static_assets_from_html("<link href=\"style.css\" /> <link rel=\"stylesheet\" href=alt.css>")
 		static_assets.should include("style.css")
 		static_assets.should include("alt.css")
+
+		static_assets.length.should equal(2)
+	end
+
+	it "returns script links" do
+		crawler = Crawler.new
+		static_assets = crawler.extract_static_assets_from_html("<script src=\"js.js\"></script> <script src=script.js type=\"text/javascript\">")
+		static_assets.should include("js.js")
+		static_assets.should include("script.js")
 
 		static_assets.length.should equal(2)
 	end
