@@ -4,17 +4,20 @@ require 'set'
 require './page.rb'
 
 class Crawler
-	def initialize
-		@link_queue = Array.new
-		@found_pages_set = Set.new
+	def initialize start_uri
+		start_uri = URI(start_uri).normalize()
+		@link_queue = [ start_uri.to_s ]
+		@found_pages_set = [ start_uri.to_s ]
 		@site_map = Array.new
-		@domain_boundary = String.new
+		@domain_boundary = start_uri.scheme + "://" + start_uri.host
+		@link_match_regex = link_match_regex = Regexp.new("<a.*?href=[\"']?(((https?)?(:\/\/)?([a-zA-Z0-9]+?\.)?gocardless\.com)[^\"'>]*|(?!https?)(?!:\/\/)[[a-zA-Z0-9]\/#\?][^\"'>]*)[\"']?[^>]*?>", Regexp::IGNORECASE)
+		@asset_match_regex = Regexp.new("<(img.*?src=[\"']?((((http)s?)?://)?[^\" '>]*)[\"']?|link.*?href=[\"']?((((http)s?)?://)?[^\" '>]*)[\"']?|script.*?src=[\"']?((((http)s?)?://)?[^\" '>]*)[\"']?).*?>", Regexp::IGNORECASE)
 	end
 
 	def extract_links_from_html(html_string)
 		links = Array.new
-		link_match_regex = Regexp.new("<a.*?href=[\"']?(((https?)?(:\/\/)?([a-zA-Z0-9]+?\.)?gocardless\.com)[^\"'>]*|(?!https?)(?!:\/\/)[[a-zA-Z0-9]\/#\?][^\"'>]*)[\"']?[^>]*?>", Regexp::IGNORECASE)
-		html_string.scan(link_match_regex) do |link|
+		
+		html_string.scan(@link_match_regex) do |link|
 			links.push(link[0])
 		end
 
@@ -23,14 +26,16 @@ class Crawler
 
 	def extract_static_assets_from_html(html_string)
 		assets = Array.new
-		asset_match_regex = Regexp.new("<(img.*?src=[\"']?((((http)s?)?://)?[^\" '>]*)[\"']?|link.*?href=[\"']?((((http)s?)?://)?[^\" '>]*)[\"']?).*?>", Regexp::IGNORECASE)
-		html_string.scan(asset_match_regex) do |asset|
+		html_string.scan(@asset_match_regex) do |asset|
 			if (asset[1])
 				asset[1].strip!
 				assets.push(asset[1])
 			elsif (asset[5])
 				asset[5].strip!
 				assets.push(asset[5])
+			elsif (asset[9])
+				asset[9].strip!
+				assets.push(asset[9])
 			end
 		end
 
@@ -47,12 +52,12 @@ class Crawler
 
 		for link in links
 			if (link.start_with?("/"))
-				link = URI.join(@domain_boundary, link).to_s
+				link = URI.join(@domain_boundary, link).normalize().to_s
 			elsif (!link.start_with?("://") || !link.start_with?("http"))
-				link = URI.join(uri_string, link).to_s
+				link = URI.join(uri_string, link).normalize().to_s
 			end
 
-			if (!@link_queue.include?(link))
+			if (!@link_queue.include?(link) && !@found_pages_set.include?(link))
 				puts "Adding " + link + " to the queue"
 				@link_queue.push(link)
 			end
@@ -60,12 +65,10 @@ class Crawler
 
 		p = Page.new(uri_string, links, assets)
 		@site_map.push(p)
+		@found_pages_set.push(uri_string)
 	end
 
-	def crawl(start_page_uri)
-		uri = URI(start_page_uri)
-		@link_queue.push(start_page_uri)
-		@domain_boundary = uri.scheme + "://" + uri.host
+	def crawl
 		puts "Domain is " + @domain_boundary
 		while @link_queue.length > 0 do
 			current_link = @link_queue.shift
