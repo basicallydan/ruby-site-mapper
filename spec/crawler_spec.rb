@@ -19,7 +19,7 @@ describe Crawler, "#extract_links_from_html" do
 end
 
 describe Crawler, "#get_page_links" do
-	it "returns a list of links" do
+	it "returns a list of anchor links" do
 		crawler = Crawler.new
 		links = crawler.get_page_links("https://gocardless.com")
 		links.should include("https://gocardless.com/blog")
@@ -31,7 +31,7 @@ end
 describe Crawler, "#extract_static_assets_from_html" do
 	it "returns images" do
 		crawler = Crawler.new
-		static_assets = crawler.extract_static_assets_from_html("<img src=cat.gif /> <img src=anothercat.gif> <img src=\"manycats.gif\"> <img src=\"http://gocardless.com/morecats.gif\" class=\"image\"> <img href=dog.png>")
+		static_assets = crawler.extract_static_assets_from_html("<img src=cat.gif /> <img class=\"whatevs\" src=anothercat.gif> <img src=\"manycats.gif\"> <img src=\"http://gocardless.com/morecats.gif\" class=\"image\"> <img href=dog.png>")
 		static_assets.should include("cat.gif")
 		static_assets.should include("anothercat.gif")
 		static_assets.should include("manycats.gif")
@@ -39,5 +39,14 @@ describe Crawler, "#extract_static_assets_from_html" do
 		static_assets.should_not include("dog.png")
 
 		static_assets.length.should equal(4)
+	end
+
+	it "returns resource links" do
+		crawler = Crawler.new
+		static_assets = crawler.extract_static_assets_from_html("<link href=\"style.css\" /> <link rel=\"stylesheet\" href=alt.css>")
+		static_assets.should include("style.css")
+		static_assets.should include("alt.css")
+
+		static_assets.length.should equal(2)
 	end
 end
