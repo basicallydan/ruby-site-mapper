@@ -64,26 +64,37 @@ class Crawler
 		end
 
 		p = Page.new(uri_string, links, assets)
-		puts p.to_s
+		puts "DONE: " + uri_string
 		@site_map.push(p)
 		@found_pages_set.push(uri_string)
+		p
 	rescue RuntimeError
 		puts "Had trouble with one of the URIs: " + uri_string
 		@found_pages_set.push(uri_string)
+		nil
 	rescue OpenURI::HTTPError => ex
 		# puts ex
 		p = Page.new(uri_string, nil, nil, ex.io.status[0])
-		puts p.to_s
+		puts "DONE: " + uri_string
 		@site_map.push(p)
 		@found_pages_set.push(uri_string)
+		p
 	end
 
 	def crawl
 		puts "Domain is " + @domain_boundary
+		output = File.open("results.html", "w")
+		output.truncate(0)
+		output << "<html><body>"
 		while @link_queue.length > 0 do
 			current_link = @link_queue.shift
 			puts "Looking at " + current_link
-			scrape_page_for_links_and_assets(current_link)
+			p = scrape_page_for_links_and_assets(current_link)
+			if (p)
+				output << p.to_html
+			end
 		end
+		output << "</body></html>"
+		output.close
 	end
 end

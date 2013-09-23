@@ -30,4 +30,29 @@ class Page
 
 		s
 	end
+
+	def to_html
+		s = "<h3 class=\"page\">URI: " + @uri + " (" + @status.to_s + ")</h3>"
+		s += "\n\r<h4>- LINKS:</h4>"
+
+		if (@links == nil || @links.length == 0)
+			s += "\n\r<span class=\"link\">-- (no links)</span>"
+		else
+			for link in @links
+				s += "<span class=\"link\">\n\r-- " + link + "</span>"
+			end
+		end
+
+		s += "\n\r<h4>- STATIC ASSETS:</h4>"
+
+		if (@assets == nil || @assets.length == 0)
+			s += "\n\r<span class=\"link\">-- (no assets)</span>"
+		else
+			for asset in @assets
+				s += "\n\r<span class=\"link\">-- " + asset + "</span>"
+			end
+		end
+
+		s
+	end
 end
