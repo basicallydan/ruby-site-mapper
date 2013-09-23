@@ -10,7 +10,7 @@ class Crawler
 		@found_pages_set = [ start_uri.to_s ]
 		@site_map = Array.new
 		@domain_boundary = start_uri.scheme + "://" + start_uri.host
-		@link_match_regex = link_match_regex = Regexp.new("<a.*?href=[\"']?(((https?)?(:\/\/)?([a-zA-Z0-9]+?\.)?gocardless\.com)[^\"'>]*|(?!https?)(?!:\/\/)[[a-zA-Z0-9]\/#\?][^\"'>]*)[\"']?[^>]*?>", Regexp::IGNORECASE)
+		@link_match_regex = link_match_regex = Regexp.new("<a.*?href=[\"']?(((https?)?(:\/\/)?([a-zA-Z0-9]+?\.)?" + start_uri.host + ")[^\"'>]*|(?!([a-zA-Z0-9]+):)[a-zA-Z0-9\/#\?][^\"'>]*)[\"']?[^>]*?>", Regexp::IGNORECASE)
 		@asset_match_regex = Regexp.new("<(img.*?src=[\"']?((((http)s?)?://)?[^\" '>]*)[\"']?|link.*?href=[\"']?((((http)s?)?://)?[^\" '>]*)[\"']?|script.*?src=[\"']?((((http)s?)?://)?[^\" '>]*)[\"']?).*?>", Regexp::IGNORECASE)
 	end
 
@@ -64,6 +64,16 @@ class Crawler
 		end
 
 		p = Page.new(uri_string, links, assets)
+		puts p.to_s
+		@site_map.push(p)
+		@found_pages_set.push(uri_string)
+	rescue RuntimeError
+		puts "Had trouble with one of the URIs: " + uri_string
+		@found_pages_set.push(uri_string)
+	rescue OpenURI::HTTPError => ex
+		# puts ex
+		p = Page.new(uri_string, nil, nil, ex.io.status[0])
+		puts p.to_s
 		@site_map.push(p)
 		@found_pages_set.push(uri_string)
 	end

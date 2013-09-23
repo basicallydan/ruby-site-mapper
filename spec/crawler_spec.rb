@@ -4,7 +4,7 @@ require_relative '../crawler'
 describe Crawler, "#extract_links_from_html" do
 	it "returns a list of links" do
 		crawler = Crawler.new("https://gocardless.com")
-		links = crawler.extract_links_from_html("<a href=\"https://gocardless.com/blog\">blog</a> <a href=\"/contact/\">contact</a> <a href=\"://gocardless.com/glob\">glob</a> <a href=\"https://www.gocardless.com/bleepbloop\" class=\"whee\">bleep</a> <a href=https://whatever.gocardless.com/stuff>whatever</a> <a href=\"http://google.com/privacy\">google privacy</a> <a href=\"relative\">hello</a> <a href=\"#hash\">hash</a> <a href=\"?query=whatever\">query</a>")
+		links = crawler.extract_links_from_html("<a href=\"https://gocardless.com/blog\">blog</a> <a href=\"/contact/\">contact</a> <a href=\"://gocardless.com/glob\">glob</a> <a href=\"https://www.gocardless.com/bleepbloop\" class=\"whee\">bleep</a> <a href=https://whatever.gocardless.com/stuff>whatever</a> <a href=\"http://google.com/privacy\">google privacy</a> <a href=\"relative\">hello</a> <a href=\"#hash\">hash</a> <a href=\"?query=whatever\">query</a> <a href=\"mailto:dan@danielhough.co.uk\">mail</a>")
 		links.should include("https://gocardless.com/blog")
 		links.should include("/contact/")
 		links.should include("://gocardless.com/glob")
@@ -42,10 +42,11 @@ describe Crawler, "#extract_static_assets_from_html" do
 
 	it "returns script links" do
 		crawler = Crawler.new("https://gocardless.com")
-		static_assets = crawler.extract_static_assets_from_html("<script src=\"js.js\"></script> <script src=script.js type=\"text/javascript\">")
+		static_assets = crawler.extract_static_assets_from_html("<script src=\"js.js\"></script> <script src=script.js type=\"text/javascript\"> <script src=\"://cdn.google.com/script.js\" type=\"text/javascript\"> ")
 		static_assets.should include("js.js")
 		static_assets.should include("script.js")
+		static_assets.should include("://cdn.google.com/script.js")
 
-		static_assets.length.should equal(2)
+		static_assets.length.should equal(3)
 	end
 end
