@@ -52,7 +52,7 @@ So, it's a pretty tough problem and would require a headless browser like [Phant
 
 ## Redirect Loops
 
-* If the crawler comes across a redirect loop, openuri actually will detect it and blow up. The crawler simply reacts to this by going "not my problem!" and ignoring it - this should probably be handled differently.
+If the crawler comes across a redirect loop, openuri actually will detect it and blow up. The crawler simply reacts to this by going "not my problem!" and ignoring it - this should probably be handled differently.
 
 ## The results are hard to view
 
