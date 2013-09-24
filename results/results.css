@@ -1,11 +1,21 @@
 body {
-	column-count:3;
+	font:12pt sans-serif;
 }
 
 .links-header, .assets-header {
 	cursor:pointer;
 }
 
+.links-header:hover, .assets-header:hover {
+	color:#555;
+}
+
 .hidden li {
 	display:none;
+}
+
+.page {
+	margin:10px;
+	background-color:#eee;
+	padding:20px;
 }

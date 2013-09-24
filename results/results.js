@@ -8,5 +8,8 @@ $(document).ready(function () {
 		linksHeader.click(function (e) {
 			links.toggleClass('hidden');
 		});
+		assetsHeader.click(function (e) {
+			assets.toggleClass('hidden');
+		});
 	});
 });

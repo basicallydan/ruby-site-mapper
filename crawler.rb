@@ -113,26 +113,32 @@ class Crawler
 	def crawl
 		t1 = Time.now
 		puts "Domain is " + @domain_boundary
-		# output = File.open("results/index.html", "w")
-		# output.truncate(0)
-		# output << "\r\n<html>"
-		# output << "\r\n<head>"
-		# output << "\r\n<script src=\"jquery-2.0.3.min.js\"></script>"
-		# output << "\r\n<script src=\"results.js\"></script>"
-		# output << "\r\n<link href=\"results.css\" rel=\"stylesheet\" />"
-		# output << "\r\n<body>"
 		scrape_next_page
 		while @link_queue.length > 0 || @num_threads > 0 do
 			# puts "Queue length is " + @link_queue.length.to_s + " and num threads is " + @num_threads.to_s
 			if (@num_threads < @max_threads && @link_queue.length > 0)
-				scrape_next_page
+				t = scrape_next_page
 			end
 		end
 		t2 = Time.now
 		total_time = t2 - t1
 		puts "Done! Found " + @found_pages_set.length.to_s + ' pages and it took ' + total_time.to_f.to_s + ' seconds to run with ' + @max_threads.to_s + ' threads available'
-		# output << "\r\n</body>"
-		# output << "\r\n</html>"
-		# output.close
+		puts "Outputting to an HTML page..."
+		output = File.open("results/index.html", "w")
+		output.truncate(0)
+		output << "\r\n<!DOCTYPE html>"
+		output << "\r\n<html>"
+		output << "\r\n<head>"
+		output << "\r\n<link href=\"results.css\" rel=\"stylesheet\" />"
+		output << "\r\n<body>"
+		for page in @site_map
+			output << page.to_html
+		end
+		output << "\r\n<script src=\"jquery-2.0.3.min.js\"></script>"
+		output << "\r\n<script src=\"results.js\"></script>"
+		output << "\r\n</body>"
+		output << "\r\n</html>"
+		output.close
+		puts "Done with the output! See it at /resuls/index.html"
 	end
 end
