@@ -32,26 +32,32 @@ class Page
 	end
 
 	def to_html
-		s = "<h3 class=\"page\">URI: " + @uri + " (" + @status.to_s + ")</h3>"
-		s += "\n\r<h4>- LINKS:</h4>"
+		s = "<div class=\"page\"><h3 class=\"page-uri\">URI: " + @uri + " (" + @status.to_s + ")</h3>"
+		s += "\n\r<h4 class=\"links-header\">LINKS:</h4>"
+		s += "\n\r<ul class=\"links-list hidden\">"
 
 		if (@links == nil || @links.length == 0)
-			s += "\n\r<span class=\"link\">-- (no links)</span>"
+			s += "\n\r<li class=\"link\">(no links)</li>"
 		else
 			for link in @links
-				s += "<span class=\"link\">\n\r-- " + link + "</span>"
+				s += "\n\r<li class=\"link\">" + link + "</li>"
 			end
 		end
 
-		s += "\n\r<h4>- STATIC ASSETS:</h4>"
+		s += "\n\r</ul>"
+
+		s += "\n\r<h4 class=\"assets-header\">STATIC ASSETS:</h4>"
+		s += "\n\r<ul class=\"assets-list hidden\">"
 
 		if (@assets == nil || @assets.length == 0)
-			s += "\n\r<span class=\"link\">-- (no assets)</span>"
+			s += "\n\r<li class=\"asset\">(no assets)</li>"
 		else
 			for asset in @assets
-				s += "\n\r<span class=\"link\">-- " + asset + "</span>"
+				s += "\n\r<li class=\"asset\">" + asset + "</li>"
 			end
 		end
+
+		s += "\n\r</ul></div>"
 
 		s
 	end

@@ -1,0 +1,11 @@
+body {
+	column-count:3;
+}
+
+.links-header, .assets-header {
+	cursor:pointer;
+}
+
+.hidden li {
+	display:none;
+}
